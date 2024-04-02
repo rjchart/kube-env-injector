@@ -28,6 +28,11 @@ func main() {
 		glog.Errorf("Error loading configuration: %v", err)
 	}
 
+	server := &http.Server{
+    Addr: fmt.Sprintf(":%v", parameters.port),
+  }
+  server.ListenAndServeTLS(parameters.certFile, parameters.keyFile);
+
 	whsvr := &WebhookServer{
 		envConfig: envConfig,
 		server: &http.Server{

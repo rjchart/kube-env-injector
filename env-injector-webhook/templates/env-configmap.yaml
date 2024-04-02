@@ -10,6 +10,8 @@ metadata:
     release: {{ .Release.Name }}
 data:
   envconfig.yaml: |
+    envFrom:
+{{ toYaml .Values.envFrom | indent 6 }}
     env:
       {{- (include "chart-env-injector.environment" .) | indent 6 }}
     dnsOptions:

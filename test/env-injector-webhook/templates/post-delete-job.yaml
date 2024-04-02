@@ -1,0 +1,148 @@
+---
+# Source: env-injector-webhook/templates/post-delete-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: env-injector-webhook-cleanup-job
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: test
+    helm.sh/chart: env-injector-webhook-0.1.1
+    app.kubernetes.io/name: env-injector-webhook
+  annotations:
+    "helm.sh/hook": post-delete,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-6"
+spec:
+  template:
+    metadata:
+      name: env-injector-webhook-cleanup-job-tpl
+      labels:
+        app.kubernetes.io/instance: test
+        app.kubernetes.io/name: env-injector-webhook
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: env-injector
+      containers:
+        - name: post-delete-job
+          image: bitnami/kubectl:latest
+          command: ["/bin/sh", "-c", "/etc/config/config.sh"]
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: env-injector-webhook-cleanup-config
+            defaultMode: 0755
+---
+# Source: env-injector-webhook/templates/post-delete-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: env-injector-webhook-cleanup-job
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: test
+    helm.sh/chart: env-injector-webhook-0.1.1
+    app.kubernetes.io/name: env-injector-webhook
+  annotations:
+    "helm.sh/hook": post-delete,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-6"
+spec:
+  template:
+    metadata:
+      name: env-injector-webhook-cleanup-job-tpl
+      labels:
+        app.kubernetes.io/instance: test
+        app.kubernetes.io/name: env-injector-webhook
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: env-injector
+      containers:
+        - name: post-delete-job
+          image: bitnami/kubectl:latest
+          command: ["/bin/sh", "-c", "/etc/config/config.sh"]
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: env-injector-webhook-cleanup-config
+            defaultMode: 0755
+---
+# Source: env-injector-webhook/templates/post-delete-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: env-injector-webhook-cleanup-job
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: test
+    helm.sh/chart: env-injector-webhook-0.1.1
+    app.kubernetes.io/name: env-injector-webhook
+  annotations:
+    "helm.sh/hook": post-delete,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-6"
+spec:
+  template:
+    metadata:
+      name: env-injector-webhook-cleanup-job-tpl
+      labels:
+        app.kubernetes.io/instance: test
+        app.kubernetes.io/name: env-injector-webhook
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: env-injector
+      containers:
+        - name: post-delete-job
+          image: bitnami/kubectl:latest
+          command: ["/bin/sh", "-c", "/etc/config/config.sh"]
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: env-injector-webhook-cleanup-config
+            defaultMode: 0755
+---
+# Source: env-injector-webhook/templates/post-delete-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: env-injector-webhook-cleanup-job
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/instance: test
+    helm.sh/chart: env-injector-webhook-0.1.1
+    app.kubernetes.io/name: env-injector-webhook
+  annotations:
+    "helm.sh/hook": post-delete,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-6"
+spec:
+  template:
+    metadata:
+      name: env-injector-webhook-cleanup-job-tpl
+      labels:
+        app.kubernetes.io/instance: test
+        app.kubernetes.io/name: env-injector-webhook
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: env-injector
+      containers:
+        - name: post-delete-job
+          image: bitnami/kubectl:latest
+          command: ["/bin/sh", "-c", "/etc/config/config.sh"]
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: env-injector-webhook-cleanup-config
+            defaultMode: 0755

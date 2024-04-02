@@ -9,7 +9,8 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   ports:
-  - port: 443
-    targetPort: 443
+  - name: https
+    port: 443
+    targetPort: https
   selector:
     app.kubernetes.io/name: {{ include "chart-env-injector.name" . }}

@@ -1,0 +1,17 @@
+---
+# Source: env-injector-webhook/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: env-injector-webhook-svc
+  labels:
+    app.kubernetes.io/name: env-injector-webhook
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: env-injector-webhook-0.1.1
+    release: test
+spec:
+  ports:
+  - port: 443
+    targetPort: 443
+  selector:
+    app.kubernetes.io/name: env-injector-webhook

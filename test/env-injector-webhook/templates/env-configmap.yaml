@@ -1,0 +1,22 @@
+---
+# Source: env-injector-webhook/templates/env-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-injector-webhook-configmap
+  namespace: default
+  labels:
+    app.kubernetes.io/name: env-injector-webhook
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: env-injector-webhook-0.1.1
+    release: test
+data:
+  envconfig.yaml: |
+    envFrom:
+      - secretRef:
+          name: stage-connect-secrets
+          optional: true
+    env:      
+      - name: CLUSTER_NAME
+        value: "aks-test-01"
+    dnsOptions:

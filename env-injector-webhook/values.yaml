@@ -1,8 +1,12 @@
-image: hmctspublic.azurecr.io/hmcts/k8s-env-injector:496359_20231218
+image: torderdevops/env-injector:latest
 replicas: 2
 removePodAntiAffinity: false
-environment: {}
-  # CLUSTER_NAME: aks-test-01
+envFrom:
+  - secretRef:
+      name: stage-connect-secrets
+      optional: true
+environment:
+  CLUSTER_NAME: aks-test-01
 dnsOptions: {}
   # ndots: 3
   # single-request-reopen:
@@ -36,3 +40,24 @@ topologyConstraints: {}
   #       app.kubernetes.io/name: test-app
   #   matchLabelKeys:
   #     - pod-template-hash
+
+replicaCount: 1
+
+service:
+  port: 443
+
+container:
+  port: 8443
+
+selectors:
+  injectPrefix: env-injector.torder.com
+  injectName: inject
+  disableInjectLabel: disable-inject
+  objectSelector: {}
+  namespaceSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values:
+          - kube-system
+          - kube-public

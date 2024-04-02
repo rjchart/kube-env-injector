@@ -1,0 +1,88 @@
+---
+# Source: env-injector-webhook/templates/post-delete-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-injector-webhook-cleanup-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: env-injector-webhook
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: env-injector-webhook-0.1.1
+    release: test
+  annotations:
+    "helm.sh/hook": post-delete,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-8"
+data:
+  config.sh: |
+    #!/bin/bash
+
+    kubectl delete mutatingwebhookconfigurations.admissionregistration.k8s.io env-injector-webhook-cfg
+    kubectl delete secret env-injector-webhook-certs -n default
+---
+# Source: env-injector-webhook/templates/post-delete-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-injector-webhook-cleanup-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: env-injector-webhook
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: env-injector-webhook-0.1.1
+    release: test
+  annotations:
+    "helm.sh/hook": post-delete,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-8"
+data:
+  config.sh: |
+    #!/bin/bash
+
+    kubectl delete mutatingwebhookconfigurations.admissionregistration.k8s.io env-injector-webhook-cfg
+    kubectl delete secret env-injector-webhook-certs -n default
+---
+# Source: env-injector-webhook/templates/post-delete-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-injector-webhook-cleanup-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: env-injector-webhook
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: env-injector-webhook-0.1.1
+    release: test
+  annotations:
+    "helm.sh/hook": post-delete,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-8"
+data:
+  config.sh: |
+    #!/bin/bash
+
+    kubectl delete mutatingwebhookconfigurations.admissionregistration.k8s.io env-injector-webhook-cfg
+    kubectl delete secret env-injector-webhook-certs -n default
+---
+# Source: env-injector-webhook/templates/post-delete-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-injector-webhook-cleanup-config
+  namespace: default
+  labels:
+    app.kubernetes.io/name: env-injector-webhook
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: env-injector-webhook-0.1.1
+    release: test
+  annotations:
+    "helm.sh/hook": post-delete,pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-8"
+data:
+  config.sh: |
+    #!/bin/bash
+
+    kubectl delete mutatingwebhookconfigurations.admissionregistration.k8s.io env-injector-webhook-cfg
+    kubectl delete secret env-injector-webhook-certs -n default

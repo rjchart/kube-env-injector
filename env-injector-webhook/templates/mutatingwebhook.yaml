@@ -1,3 +1,20 @@
+{{- $caPrefix := printf "%s-ca" .Release.Name }}
+  {{- $ca := genCA $caPrefix 3650 }}
+  {{- $cn := .Release.Name }}
+  {{- $altName1 := printf "%s.%s.svc" (include "service.name" .) .Release.Namespace }}
+  {{- $cert := genSignedCert $cn nil (list $altName1) 3650 $ca }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "certs.secret.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "common.labels" . | indent 4 }}
+data:
+  cert.pem: {{ b64enc $cert.Cert }}
+  key.pem: {{ b64enc $cert.Key }}
+---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -20,11 +37,36 @@ webhooks:
         name: {{ include "chart-env-injector.name" . }}-svc
         namespace: {{ .Release.Namespace }}
         path: "/mutate"
+      caBundle: {{ b64enc $ca.Cert }}
     rules:
       - operations: [ "CREATE" ]
         apiGroups: [""]
         apiVersions: ["v1"]
         resources: ["pods"]
     namespaceSelector:
+      matchExpressions:
+        {{- with .Values.selectors.namespaceSelector.matchExpressions }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        - key: {{ .Values.selectors.injectPrefix }}/{{ .Values.selectors.disableInjectLabel }}
+          operator: NotIn
+          values:
+            - "true"
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - {{ .Release.Namespace }}
+    objectSelector:
+      {{- with .Values.selectors.objectSelector.matchLabels }}
       matchLabels:
-        hmcts.github.com/envInjector: enabled
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      matchExpressions:
+        - key: {{ .Values.selectors.injectPrefix }}/{{ .Values.selectors.injectName }}
+          operator: NotIn
+          values:
+            - skip
+        - key: {{ .Values.selectors.injectPrefix }}/{{ .Values.selectors.disableInjectLabel }}
+          operator: NotIn
+          values:
+            - "true"
