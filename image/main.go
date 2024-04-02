@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"flag"
 	"fmt"
 	"net/http"
@@ -31,23 +30,10 @@ func main() {
 	server := &http.Server{
     Addr: fmt.Sprintf(":%v", parameters.port),
   }
-  server.ListenAndServeTLS(parameters.certFile, parameters.keyFile);
 
 	whsvr := &WebhookServer{
 		envConfig: envConfig,
-		server: &http.Server{
-			Addr: fmt.Sprintf(":%v", parameters.port),
-			TLSConfig: &tls.Config{
-				GetCertificate: func(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error) {
-					pair, err := tls.LoadX509KeyPair(parameters.certFile, parameters.keyFile)
-					if err != nil {
-						return nil, fmt.Errorf("Error loading key pair: %w", err)
-					}
-
-					return &pair, nil
-				},
-			},
-		},
+		server: server,
 	}
 
 	// define http server and server handler
@@ -57,7 +43,7 @@ func main() {
 
 	// start webhook server in new rountine
 	go func() {
-		if err := whsvr.server.ListenAndServeTLS("", ""); err != nil {
+		if err := whsvr.server.ListenAndServeTLS(parameters.certFile, parameters.keyFile); err != nil {
 			glog.Errorf("Filed to listen and serve env-injector-webhook server: %v", err)
 		}
 	}()
