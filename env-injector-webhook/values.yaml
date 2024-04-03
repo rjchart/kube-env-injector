@@ -1,4 +1,4 @@
-image: torderdevops/env-injector:latest
+image: torderdevops/env-injector:1.1.5
 replicas: 2
 removePodAntiAffinity: false
 envFrom:

@@ -13,6 +13,7 @@ func createPatch(pod *corev1.Pod, envConfig *Config, annotations map[string]stri
 
 	for idx, container := range pod.Spec.Containers {
 		patches = append(patches, addEnv(container.Env, envConfig.Env, fmt.Sprintf("/spec/containers/%d/env", idx))...)
+		patches = append(patches, addEnvFrom(container.EnvFrom, envConfig.EnvFrom, fmt.Sprintf("/spec/containers/%d/envFrom", idx))...)
 	}
 	if len(envConfig.DnsOptions) > 0 {
 		if pod.Spec.DNSConfig == nil {

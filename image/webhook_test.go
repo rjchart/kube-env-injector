@@ -9,8 +9,10 @@ import (
 )
 
 func TestLoadConfig(t *testing.T) {
+  trueVal := true
 	ndotsVal := "3"
 	topologyHonorPolicy := corev1.NodeInclusionPolicyHonor
+	testEnvFrom := corev1.SecretEnvSource{LocalObjectReference: corev1.LocalObjectReference{Name: "stage-connect-secrets"}, Optional: &trueVal}
 	files := []struct {
 		name string
 		env  *Config
@@ -18,6 +20,13 @@ func TestLoadConfig(t *testing.T) {
 		{"test/env_test_1.yaml",
 			&Config{
 				[]corev1.EnvVar{{Name: "CLUSTER_NAME", Value: "aks-test-01", ValueFrom: nil}},
+				nil, nil, nil, nil, nil, nil, false, // nil = empty tests, false for boolean not defined
+			},
+		},
+		{"test/env_test_1_1.yaml",
+			&Config{
+				[]corev1.EnvVar{{Name: "CLUSTER_NAME", Value: "aks-test-01", ValueFrom: nil}},
+				[]corev1.EnvFromSource{{SecretRef: &testEnvFrom}},
 				nil, nil, nil, nil, nil, false, // nil = empty tests, false for boolean not defined
 			},
 		},
@@ -25,13 +34,13 @@ func TestLoadConfig(t *testing.T) {
 			&Config{
 				[]corev1.EnvVar{{Name: "CLUSTER_NAME", Value: "aks-test-01", ValueFrom: nil},
 					{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}},
-				nil, nil, nil, nil, nil, false, // nil = empty tests, false for boolean not defined
+				nil, nil, nil, nil, nil, nil, false, // nil = empty tests, false for boolean not defined
 			},
 		},
 		{"test/env_test_3.yaml",
 			&Config{
 				[]corev1.EnvVar{{Name: "CLUSTER_NAME", Value: "aks-test-01", ValueFrom: nil},
-					{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}},
+					{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}}, nil,
 				[]corev1.PodDNSConfigOption{{Name: "ndots", Value: &ndotsVal},
 					{Name: "single-request-reopen", Value: nil},
 					{Name: "use-vc", Value: nil}},
@@ -41,7 +50,7 @@ func TestLoadConfig(t *testing.T) {
 		{"test/env_test_4.yaml",
 			&Config{
 				[]corev1.EnvVar{{Name: "CLUSTER_NAME", Value: "aks-test-01", ValueFrom: nil},
-					{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}},
+					{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}}, nil,
 				[]corev1.PodDNSConfigOption{{Name: "ndots", Value: &ndotsVal},
 					{Name: "single-request-reopen", Value: nil},
 					{Name: "use-vc", Value: nil}},
@@ -55,7 +64,7 @@ func TestLoadConfig(t *testing.T) {
 		},
 		{"test/env_test_5.yaml",
 			&Config{[]corev1.EnvVar{{Name: "CLUSTER_NAME", Value: "aks-test-01", ValueFrom: nil},
-				{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}},
+				{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}}, nil,
 				[]corev1.PodDNSConfigOption{{Name: "ndots", Value: &ndotsVal},
 					{Name: "single-request-reopen", Value: nil},
 					{Name: "use-vc", Value: nil}},
@@ -78,7 +87,7 @@ func TestLoadConfig(t *testing.T) {
 		{"test/env_test_6.yaml",
 			&Config{
 				[]corev1.EnvVar{{Name: "CLUSTER_NAME", Value: "aks-test-01", ValueFrom: nil},
-					{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}},
+					{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}}, nil,
 				[]corev1.PodDNSConfigOption{{Name: "ndots", Value: &ndotsVal},
 					{Name: "single-request-reopen", Value: nil},
 					{Name: "use-vc", Value: nil}},
@@ -104,7 +113,7 @@ func TestLoadConfig(t *testing.T) {
 		{"test/env_test_7.yaml",
 			&Config{
 				[]corev1.EnvVar{{Name: "CLUSTER_NAME", Value: "aks-test-01", ValueFrom: nil},
-					{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}},
+					{Name: "SUBSCRIPTION", Value: "subscription-00", ValueFrom: nil}}, nil,
 				[]corev1.PodDNSConfigOption{{Name: "ndots", Value: &ndotsVal},
 					{Name: "single-request-reopen", Value: nil},
 					{Name: "use-vc", Value: nil}},
@@ -255,6 +264,38 @@ func TestAddEnv(t *testing.T) {
 		}
 	}
 }
+
+
+func TestAddEnvFrom(t *testing.T) {
+  trueVal := true
+  targetEnvFrom := corev1.SecretEnvSource{LocalObjectReference: corev1.LocalObjectReference{Name: "app-secrets"}, Optional: &trueVal}
+  targetEnvFrom2 := corev1.SecretEnvSource{LocalObjectReference: corev1.LocalObjectReference{Name: "waiting-secrets"}, Optional: &trueVal}
+  targetEnvFrom3 := corev1.ConfigMapEnvSource{LocalObjectReference: corev1.LocalObjectReference{Name: "app-config"}, Optional: &trueVal}
+  sourceEnvFrom := corev1.SecretEnvSource{LocalObjectReference: corev1.LocalObjectReference{Name: "stage-connect-secrets"}, Optional: &trueVal}
+	envs := []struct {
+		targetEnv []corev1.EnvFromSource
+		sourceEnv []corev1.EnvFromSource
+		path      string
+		patch     []patchOperation
+	}{
+		{
+			targetEnv: []corev1.EnvFromSource{{SecretRef: &targetEnvFrom}, {SecretRef: &targetEnvFrom2}, {ConfigMapRef: &targetEnvFrom3}},
+			sourceEnv: []corev1.EnvFromSource{{SecretRef: &sourceEnvFrom}},
+			path:      "/spec/containers/nginx/envFrom",
+			patch: []patchOperation{
+				{Op: "add", Path: "/spec/containers/nginx/envFrom/-", Value: corev1.EnvFromSource{SecretRef: &sourceEnvFrom}},
+			},
+		},
+	}
+
+	for _, e := range envs {
+		patch := addEnvFrom(e.targetEnv, e.sourceEnv, e.path)
+		if !cmp.Equal(patch, e.patch) {
+			t.Errorf("addEnvFrom was incorrect, for %v, got: %v, want: %v.", e.targetEnv, patch, e.patch)
+		}
+	}
+}
+
 
 func TestAddDnsOptions(t *testing.T) {
 	ndotsVal := "3"

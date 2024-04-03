@@ -1,7 +1,7 @@
 {{- $caPrefix := printf "%s-ca" .Release.Name }}
   {{- $ca := genCA $caPrefix 3650 }}
   {{- $cn := .Release.Name }}
-  {{- $altName1 := printf "%s.%s.svc" (include "service.name" .) .Release.Namespace }}
+  {{- $altName1 := printf "%s.%s.svc" (include "chart-env-injector.name" .) .Release.Namespace }}
   {{- $cert := genSignedCert $cn nil (list $altName1) 3650 $ca }}
 ---
 apiVersion: v1
@@ -34,7 +34,7 @@ webhooks:
     sideEffects: NoneOnDryRun
     clientConfig:
       service:
-        name: {{ include "chart-env-injector.name" . }}-svc
+        name: {{ include "chart-env-injector.name" . }}
         namespace: {{ .Release.Namespace }}
         path: "/mutate"
       caBundle: {{ b64enc $ca.Cert }}
@@ -63,9 +63,9 @@ webhooks:
       {{- end }}
       matchExpressions:
         - key: {{ .Values.selectors.injectPrefix }}/{{ .Values.selectors.injectName }}
-          operator: NotIn
+          operator: In
           values:
-            - skip
+            - "true"
         - key: {{ .Values.selectors.injectPrefix }}/{{ .Values.selectors.disableInjectLabel }}
           operator: NotIn
           values:

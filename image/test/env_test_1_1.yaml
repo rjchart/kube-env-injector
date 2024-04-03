@@ -1,0 +1,7 @@
+envFrom:
+  - secretRef:
+      name: stage-connect-secrets
+      optional: true
+env:
+  - name: CLUSTER_NAME
+    value: aks-test-01

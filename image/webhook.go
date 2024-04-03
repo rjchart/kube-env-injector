@@ -39,13 +39,14 @@ type WebhookServer struct {
 // Webhook Server parameters
 type WhSvrParameters struct {
 	port       int    // webhook server port
-	certFile   string // path to the x509 certificate for https
-	keyFile    string // path to the x509 private key matching `CertFile`
+	certFile   string // path to certificate for https
+	keyFile    string // path to private key matching `CertFile`
 	envCfgFile string // path to env injector configuration file
 }
 
 type Config struct {
 	Env                        []corev1.EnvVar                   `yaml:"env"`
+	EnvFrom                    []corev1.EnvFromSource            `yaml:"envFrom"`
 	DnsOptions                 []corev1.PodDNSConfigOption       `yaml:"dnsOptions,omitempty"`
 	RequiredNodeAffinityTerms  []corev1.NodeSelectorTerm         `yaml:"requiredNodeAffinityTerms,omitempty"`
 	PreferredNodeAffinityTerms []corev1.PreferredSchedulingTerm  `yaml:"preferredNodeAffinityTerms,omitempty"`
