@@ -63,9 +63,9 @@ webhooks:
       {{- end }}
       matchExpressions:
         - key: {{ .Values.selectors.injectPrefix }}/{{ .Values.selectors.injectName }}
-          operator: In
+          operator: NotIn
           values:
-            - "true"
+            - skip
         - key: {{ .Values.selectors.injectPrefix }}/{{ .Values.selectors.disableInjectLabel }}
           operator: NotIn
           values:

@@ -53,7 +53,9 @@ selectors:
   injectPrefix: env-injector.torder.com
   injectName: inject
   disableInjectLabel: disable-inject
-  objectSelector: {}
+  objectSelector:
+    matchLabels:
+      env-injector.torder.com/inject: "true"
   namespaceSelector:
     matchExpressions:
       - key: kubernetes.io/metadata.name
